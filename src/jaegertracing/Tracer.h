@@ -43,6 +43,8 @@
 
 namespace jaegertracing {
 
+void inject_jaeger(uint64_t jaeger_trace_id, uint64_t jaeger_parent_id);
+
 class Tracer : public opentracing::Tracer,
                public std::enable_shared_from_this<Tracer> {
   public:

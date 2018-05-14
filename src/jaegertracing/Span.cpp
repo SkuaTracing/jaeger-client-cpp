@@ -98,6 +98,10 @@ void Span::FinishWithOptions(
         _duration = finishTimeSteady - _startTimeSteady;
         tracer = _tracer;
 
+	if (contextNoLock().isSampled()) {
+            inject_jaeger(0, 0);
+	}
+
         std::copy(finishSpanOptions.log_records.begin(),
                   finishSpanOptions.log_records.end(),
                   std::back_inserter(_logs));
