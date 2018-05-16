@@ -35,6 +35,7 @@ void inject_jaeger(uint64_t jaeger_trace_id, uint64_t jaeger_parent_id) {
     buf[1] = jaeger_parent_id;
 
     fwrite(buf, sizeof(uint64_t), 2, procfile);
+    fflush(procfile);
 }
 
 namespace {
