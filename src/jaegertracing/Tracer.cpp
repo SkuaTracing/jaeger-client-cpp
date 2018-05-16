@@ -150,7 +150,7 @@ Tracer::startSpanInternal(const SpanContext& context,
                           const std::vector<Reference>& references) const
 {
     if (context.isSampled()) {
-         inject_jaeger(span->context().traceID().low(), span->context().spanID());
+         inject_jaeger(context.traceID().low(), context.spanID());
     }
     std::vector<Tag> spanTags;
     spanTags.reserve(tags.size() + internalTags.size());
