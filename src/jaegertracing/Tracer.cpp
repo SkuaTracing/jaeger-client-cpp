@@ -28,14 +28,13 @@
 namespace jaegertracing {
 
 void inject_jaeger(uint64_t jaeger_trace_id, uint64_t jaeger_parent_id) {
-    FILE *procfile = fopen("/proc/lttng_jaeger", "w");
+    static FILE *procfile = fopen("/proc/lttng_jaeger", "w");
     uint64_t *buf = (uint64_t *)malloc(sizeof(uint64_t) * 2);
 
     buf[0] = jaeger_trace_id;
     buf[1] = jaeger_parent_id;
 
     fwrite(buf, sizeof(uint64_t), 2, procfile);
-    fclose(procfile);
 }
 
 namespace {
@@ -150,6 +149,9 @@ Tracer::startSpanInternal(const SpanContext& context,
                           bool newTrace,
                           const std::vector<Reference>& references) const
 {
+    if (context.isSampled()) {
+         inject_jaeger(span->context().traceID().low(), span->context().spanID());
+    }
     std::vector<Tag> spanTags;
     spanTags.reserve(tags.size() + internalTags.size());
     std::transform(
@@ -159,8 +161,6 @@ Tracer::startSpanInternal(const SpanContext& context,
         [](const OpenTracingTag& tag) { return Tag(tag.first, tag.second); });
     spanTags.insert(
         std::end(spanTags), std::begin(internalTags), std::end(internalTags));
-
-
 
     std::unique_ptr<Span> span(new Span(shared_from_this(),
                                         context,
@@ -176,7 +176,6 @@ Tracer::startSpanInternal(const SpanContext& context,
         if (newTrace) {
             _metrics->tracesStartedSampled().inc(1);
         }
-	inject_jaeger(span->context().traceID().low(), span->context().spanID());
     }
     else {
         _metrics->spansNotSampled().inc(1);
