@@ -28,13 +28,19 @@
 namespace jaegertracing {
 
 void inject_jaeger(uint64_t jaeger_trace_id, uint64_t jaeger_parent_id) {
-    static FILE *procfile = fopen("/proc/lttng_jaeger", "w");
-    uint64_t buf[2];
+    // inject_jaeger() writes a given jaeger trace context into the kernel
 
+    // /proc/lttng_jaeger is created by jaeger-ctx kernel module
+    // it is opened using static to reduce syscall overhead
+    static FILE *procfile = fopen("/proc/lttng_jaeger", "w");
+    
+    // write the jaeger trace and parent IDs as raw bytes
+    uint64_t buf[2];
     buf[0] = jaeger_trace_id;
     buf[1] = jaeger_parent_id;
-
     fwrite(buf, sizeof(uint64_t), 2, procfile);
+
+    // flush file to ensure the context is written
     fflush(procfile);
 }
 
@@ -150,6 +156,7 @@ Tracer::startSpanInternal(const SpanContext& context,
                           bool newTrace,
                           const std::vector<Reference>& references) const
 {
+    // write context data into the kernel if this trace is being sampled
     if (context.isSampled()) {
          inject_jaeger(context.traceID().low(), context.spanID());
     }
