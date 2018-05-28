@@ -29,7 +29,7 @@ namespace jaegertracing {
 
 void inject_jaeger(uint64_t jaeger_trace_id, uint64_t jaeger_parent_id) {
     static FILE *procfile = fopen("/proc/lttng_jaeger", "w");
-    uint64_t *buf = (uint64_t *)malloc(sizeof(uint64_t) * 2);
+    uint64_t buf[2];
 
     buf[0] = jaeger_trace_id;
     buf[1] = jaeger_parent_id;
