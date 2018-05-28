@@ -83,14 +83,15 @@ void Span::SetBaggageItem(opentracing::string_view restrictedKey,
 void Span::FinishWithOptions(
     const opentracing::FinishSpanOptions& finishSpanOptions) noexcept
 {
-    if (context().isSampled()) {
-	uint64_t parentID = contextNoLock().parentID();
-	if (parentID) {
-	    inject_jaeger(contextNoLock().traceID().low(), parentID);
+    if (contextNoLock().isSampled()) {
+        uint64_t parentID = contextNoLock().parentID();
+        if (parentID) {
+            inject_jaeger(contextNoLock().traceID().low(), parentID);
         } else {
-	    inject_jaeger(0, 0);
-	}
+            inject_jaeger(0, 0);
+        }
     }
+    
     const auto finishTimeSteady =
         (finishSpanOptions.finish_steady_timestamp == SteadyClock::time_point())
             ? SteadyClock::now()
