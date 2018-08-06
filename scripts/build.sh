@@ -18,14 +18,23 @@ function working() {
 }
 
 function main() {
+    local project_dir
+    project_dir=$(git rev-parse --show-toplevel)
+    cd "$project_dir"
+
     mkdir -p build
     cd build
-    coverage_option=${COVERAGE:+"-DJAEGERTRACING_COVERAGE=ON"}
-    cmake -DCMAKE_BUILD_TYPE=Debug "${coverage_option}" ..
+    cmake ${CMAKE_OPTIONS} ..
     make -j3 UnitTest
     info "Running tests..."
     ./UnitTest
     working "All tests compiled and passed"
+
+    set -x
+    if ! [[ "${CMAKE_OPTIONS}" =~ "-DJAEGERTRACING_BUILD_CROSSDOCK=ON" ]]; then
+        exit 0
+    fi
+    make crossdock-fresh
 }
 
 main

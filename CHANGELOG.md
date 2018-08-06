@@ -1,6 +1,28 @@
 Changes by Version
 ==================
 
+0.5.0 (unreleased)
+------------------
+- Nothing yet
+
+
+0.4.1 (2018-05-16)
+------------------
+- Add example application (#101)
+- Improve CMake installation to allow use of lib64 directory (#102)
+- Fix CMake config for OpenTracing dependency (#103)
+- Fix tracer inject for HTTP headers (#107)
+
+
+0.4.0 (2018-05-07)
+------------------
+- Build shared plugin for Linux amd64 using Docker (#82)
+- Fix UDP test compilation error (#88)
+- Fix usage of propagation headers config (#91)
+- Fix dynamic load build error (#92)
+- Use Thrift 0.11.0 (#94)
+
+
 0.3.0 (2018-04-17)
 ------------------
 - Use LogRecord in Span::FinishWithOptions (#58)
